@@ -1,10 +1,10 @@
 package com.finreach.paymentservice.statistics;
 
-import com.finreach.paymentservice.domain.Account;
-import com.finreach.paymentservice.domain.Transaction;
+import com.finreach.paymentservice.model.Account;
+import com.finreach.paymentservice.model.Transaction;
+import com.finreach.paymentservice.service.AccountsService;
 import com.finreach.paymentservice.statistics.StatisticBuilder;
 import com.finreach.paymentservice.statistics.Statistics;
-import com.finreach.paymentservice.store.AccountsService;
 
 import java.time.Instant;
 import java.util.Date;

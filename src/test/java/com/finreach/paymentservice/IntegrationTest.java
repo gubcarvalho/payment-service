@@ -3,8 +3,8 @@ package com.finreach.paymentservice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finreach.paymentservice.api.request.CreateAccount;
 import com.finreach.paymentservice.api.request.CreatePayment;
+import com.finreach.paymentservice.model.PaymentState;
 import com.finreach.paymentservice.statistics.Statistics;
-import com.finreach.paymentservice.util.TransactionsGenerator;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class IntegrationTest {
                 .content(mapper.writeValueAsBytes(new CreatePayment(50d, a1, a2))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.amount").value(50d))
-                .andExpect(jsonPath("$.state").value("CREATED"))
+                .andExpect(jsonPath("$.state").value(PaymentState.CREATED.toString()))
                 .andExpect(jsonPath("$.sourceAccountId").value(a1))
                 .andExpect(jsonPath("$.destinationAccountId").value(a2))
                 .andReturn();
@@ -68,7 +68,7 @@ public class IntegrationTest {
         final String id = mapper.readTree(result.getResponse().getContentAsString()).findValue("id").asText();
         mockMvc.perform(patch("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("EXECUTED"));
+                .andExpect(jsonPath("$.state").value(PaymentState.EXECUTED.toString()));
  
         mockMvc.perform(get("/api/v1/account/" + a1))
                 .andExpect(status().isOk())
@@ -89,7 +89,7 @@ public class IntegrationTest {
 
         mockMvc.perform(get("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("EXECUTED"));
+                .andExpect(jsonPath("$.state").value(PaymentState.EXECUTED.toString()));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class IntegrationTest {
                 .content(mapper.writeValueAsBytes(new CreatePayment(50d, a1, a2))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.amount").value(50d))
-                .andExpect(jsonPath("$.state").value("CREATED"))
+                .andExpect(jsonPath("$.state").value(PaymentState.CREATED.toString()))
                 .andExpect(jsonPath("$.sourceAccountId").value(a1))
                 .andExpect(jsonPath("$.destinationAccountId").value(a2))
                 .andReturn();
@@ -120,7 +120,7 @@ public class IntegrationTest {
         final String id = mapper.readTree(result.getResponse().getContentAsString()).findValue("id").asText();
         mockMvc.perform(patch("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("REJECTED"));
+                .andExpect(jsonPath("$.state").value(PaymentState.REJECTED.toString()));
 
         mockMvc.perform(get("/api/v1/account/" + a1))
                 .andExpect(status().isOk())
@@ -137,7 +137,7 @@ public class IntegrationTest {
 
         mockMvc.perform(get("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("REJECTED"));
+                .andExpect(jsonPath("$.state").value(PaymentState.REJECTED.toString()));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class IntegrationTest {
                 .content(mapper.writeValueAsBytes(new CreatePayment(50d, a1, a2))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.amount").value(50d))
-                .andExpect(jsonPath("$.state").value("CREATED"))
+                .andExpect(jsonPath("$.state").value(PaymentState.CREATED.toString()))
                 .andExpect(jsonPath("$.sourceAccountId").value(a1))
                 .andExpect(jsonPath("$.destinationAccountId").value(a2))
                 .andReturn();
@@ -168,14 +168,14 @@ public class IntegrationTest {
         final String id = mapper.readTree(result.getResponse().getContentAsString()).findValue("id").asText();
         mockMvc.perform(delete("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("CANCELED"));
+                .andExpect(jsonPath("$.state").value(PaymentState.CANCELED.toString()));
 
         mockMvc.perform(patch("/api/v1/payment/" + id))
                 .andExpect(status().isBadRequest());
        
         mockMvc.perform(get("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("CANCELED"));
+                .andExpect(jsonPath("$.state").value(PaymentState.CANCELED.toString()));
     }
     
     @Test

@@ -1,8 +1,8 @@
 package com.finreach.paymentservice.statistics;
 
-import com.finreach.paymentservice.domain.Transaction;
-
 import java.util.List;
+
+import com.finreach.paymentservice.model.Transaction;
 
 public class Statistic {
 

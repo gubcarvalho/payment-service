@@ -1,11 +1,11 @@
 package com.finreach.paymentservice.api;
 
 import com.finreach.paymentservice.api.request.CreatePayment;
-import com.finreach.paymentservice.domain.Payment;
-import com.finreach.paymentservice.store.AccountsService;
-import com.finreach.paymentservice.store.InvalidPaymentException;
-import com.finreach.paymentservice.store.PaymentNotFoundException;
-import com.finreach.paymentservice.store.PaymentsService;
+import com.finreach.paymentservice.model.Payment;
+import com.finreach.paymentservice.service.AccountNotFoundException;
+import com.finreach.paymentservice.service.InvalidPaymentException;
+import com.finreach.paymentservice.service.PaymentNotFoundException;
+import com.finreach.paymentservice.service.PaymentsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,25 +22,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/payment")
 public class PaymentController {
-
-	@Autowired
-	private AccountsService accountsService;
 	
 	@Autowired
 	private PaymentsService paymentsService;
 	
     @PostMapping
     public ResponseEntity<Payment> create(@RequestBody CreatePayment request) {
-
-    	// validar contas
-    	if (!accountValidate(request))
-        	return ResponseEntity.notFound().build();
-        	
     	try {
     		final Payment payment = this.paymentsService.create(request);
         	return ResponseEntity.status(HttpStatus.CREATED).body(payment);
+    	} catch (AccountNotFoundException ex) {
+        	return ResponseEntity.notFound().build();
     	} catch (InvalidPaymentException ex) {
-    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        	return ResponseEntity.badRequest().build();
     	}
     }
 
@@ -78,16 +71,5 @@ public class PaymentController {
 		} catch (InvalidPaymentException e) {
         	return ResponseEntity.badRequest().build();
 		}
-    }
-    
-    private boolean accountValidate(final CreatePayment request) {
-        
-    	if (!this.accountsService.exists(request.getSourceAccountId()))
-        	return false;
-
-        if (request.getDestinationAccountId() != request.getSourceAccountId() && !this.accountsService.exists(request.getDestinationAccountId()))
-        	return false;
-        
-    	return true;
     }
 }

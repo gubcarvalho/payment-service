@@ -1,6 +1,6 @@
 package com.finreach.paymentservice.statistics;
 
-import com.finreach.paymentservice.domain.Transaction;
+import com.finreach.paymentservice.model.Transaction;
 import com.finreach.paymentservice.util.MathUtils;
 
 import java.util.Comparator;
