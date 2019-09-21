@@ -11,11 +11,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Accounts {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AccountsServiceImpl implements AccountsService {
 
     private static final Map<String, Account> ACCOUNTS = new HashMap<>();
 
-    public static Account create(CreateAccount request) {
+    @Autowired
+    private TransactionsService transactionsService;
+    
+    @Override
+	public Account create(CreateAccount request) {
     	
     	final Account account = new AccountBuilder()
     		.setBalance(request.getBalance())
@@ -25,14 +33,16 @@ public class Accounts {
         return account;
     }
     
-    public static boolean exists(String accountId) {
+    @Override
+	public boolean exists(String accountId) {
     	final Optional<Account> accountOpt = get(accountId);
         if (!accountOpt.isPresent())
             return false;
         return true;
     }
     
-    public static boolean checkWithdrawn(String id, Double amount) {
+    @Override
+	public boolean checkWithdrawn(String id, Double amount) {
 
     	final Optional<Account> accountOpt = get(id);
         if (!accountOpt.isPresent())
@@ -42,24 +52,27 @@ public class Accounts {
         return (account.getBalance() >= amount);
     }
     
-    public static void transaction(String id, Double amount) {
+    @Override
+	public void transaction(String id, Double amount) {
 
     	final Optional<Account> accountOpt = get(id);
         if (!accountOpt.isPresent())
             return;
 
         Account account = accountOpt.get();
-        account.getTransactions().add(Transactions.create(id, amount));
+        account.getTransactions().add(this.transactionsService.create(id, amount));
         account.setBalance(Double.sum(account.getBalance(), amount));
         
         ACCOUNTS.put(id, account);
     }
 
-    public static Optional<Account> get(String id) {
+    @Override
+	public Optional<Account> get(String id) {
         return Optional.ofNullable(ACCOUNTS.get(id));
     }
 
-    public static List<Account> all() {
+    @Override
+	public List<Account> all() {
     	return ACCOUNTS.values().stream()
     			.sorted(Comparator.comparing(Account::getId))
     			.collect(Collectors.toList());

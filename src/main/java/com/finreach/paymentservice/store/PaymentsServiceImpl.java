@@ -11,11 +11,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class Payments {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    private static final Map<String, Payment> PAYMENTS = new HashMap<>();
+@Service
+public class PaymentsServiceImpl implements PaymentsService {
 
-    public static Payment create(CreatePayment request) throws InvalidPaymentException {
+	@Autowired
+	private AccountsService accountsService;
+
+	private static final Map<String, Payment> PAYMENTS = new HashMap<>();
+
+    @Override
+	public Payment create(CreatePayment request) throws InvalidPaymentException {
 
         final Payment payment = new PaymentBuilder()
         		.setAmount( request.getAmount() )
@@ -28,7 +36,8 @@ public class Payments {
         return payment;
     }
 
-    public static Payment get(String id) throws PaymentNotFoundException {
+    @Override
+	public Payment get(String id) throws PaymentNotFoundException {
     	
     	Optional<Payment> opt = Optional.ofNullable(PAYMENTS.get(id));
         if (!opt.isPresent())
@@ -37,25 +46,27 @@ public class Payments {
         return opt.get();
     }
 
-    public static List<Payment> all() {
+    @Override
+	public List<Payment> all() {
         return new ArrayList<>(PAYMENTS.values());
     }
 
-    public static Payment execute(String id) throws PaymentNotFoundException, InvalidPaymentException {
+    @Override
+	public Payment execute(String id) throws PaymentNotFoundException, InvalidPaymentException {
 
     	Payment payment = get(id);
         if (!payment.getState().equals(PaymentState.CREATED))
             throw new InvalidPaymentException();
 
-		if (!Accounts.checkWithdrawn(payment.getSourceAccountId(), payment.getAmount())) {
+		if (!this.accountsService.checkWithdrawn(payment.getSourceAccountId(), payment.getAmount())) {
 			// no funds -> reject the payment
 			payment.setState(PaymentState.REJECTED);
 		} else {
 			// A transaction should be created on the source account with a negative amount.
-			Accounts.transaction(payment.getSourceAccountId(), payment.getAmount()*-1);
+			this.accountsService.transaction(payment.getSourceAccountId(), payment.getAmount()*-1);
 			
 			// A transaction should be created on the destination account with a positive amount.
-			Accounts.transaction(payment.getDestinationAccountId(), payment.getAmount());
+			this.accountsService.transaction(payment.getDestinationAccountId(), payment.getAmount());
 
 			// The state must be changed to EXECUTED.
 			payment.setState(PaymentState.EXECUTED);
@@ -65,7 +76,8 @@ public class Payments {
 		return payment;
 	}
 
-    public static Payment cancel(String id) throws PaymentNotFoundException, InvalidPaymentException {
+    @Override
+	public Payment cancel(String id) throws PaymentNotFoundException, InvalidPaymentException {
 
         Payment payment = get(id);
         if (!payment.getState().equals(PaymentState.CREATED))

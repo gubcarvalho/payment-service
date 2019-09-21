@@ -5,8 +5,10 @@ import com.finreach.paymentservice.domain.Account;
 import com.finreach.paymentservice.domain.Transaction;
 import com.finreach.paymentservice.statistics.StatisticBuilder;
 import com.finreach.paymentservice.statistics.Statistics;
-import com.finreach.paymentservice.store.Accounts;
+import com.finreach.paymentservice.store.AccountsService;
+import com.finreach.paymentservice.store.AccountsServiceImpl;
 import org.apache.commons.lang3.RandomUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -24,6 +26,9 @@ public class TransactionsGenerator {
     private static final double MAX_AMOUNT = 1000d;
     private static final double BALANCE = 1000000d;
 
+    @Autowired
+    private AccountsService accountsService;
+    
     private List<String> genAccounts = new ArrayList<>();
 
     public void generate() throws InterruptedException {
@@ -37,15 +42,15 @@ public class TransactionsGenerator {
 
             final RandomAccounts randomAccounts = randomAccounts();
             final double amount = randomAmount();
-            Accounts.transaction(randomAccounts.a1, -amount);
-            Accounts.transaction(randomAccounts.a2, amount);
+            this.accountsService.transaction(randomAccounts.a1, -amount);
+            this.accountsService.transaction(randomAccounts.a2, amount);
         }
     }
 
     public Statistics calculate(int periodInSeconds) {
         Date when = Date.from(Instant.now().minusSeconds(periodInSeconds));
         final Statistics statistics = new Statistics();
-        Accounts.all()
+        this.accountsService.all()
                 .forEach(account -> calculate(periodInSeconds, when, statistics, account));
 
         return statistics;
@@ -70,7 +75,7 @@ public class TransactionsGenerator {
 
     private void generateAccounts() {
         for (int i = 0; i < ACCOUNTS; i++) {
-            genAccounts.add(Accounts.create(new CreateAccount(BALANCE)).getId());
+            genAccounts.add(this.accountsService.create(new CreateAccount(BALANCE)).getId());
         }
     }
 

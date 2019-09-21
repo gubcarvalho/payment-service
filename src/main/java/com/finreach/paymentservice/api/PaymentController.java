@@ -2,11 +2,12 @@ package com.finreach.paymentservice.api;
 
 import com.finreach.paymentservice.api.request.CreatePayment;
 import com.finreach.paymentservice.domain.Payment;
-import com.finreach.paymentservice.store.Accounts;
+import com.finreach.paymentservice.store.AccountsService;
 import com.finreach.paymentservice.store.InvalidPaymentException;
 import com.finreach.paymentservice.store.PaymentNotFoundException;
-import com.finreach.paymentservice.store.Payments;
+import com.finreach.paymentservice.store.PaymentsService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/payment")
 public class PaymentController {
 
+	@Autowired
+	private AccountsService accountsService;
+	
+	@Autowired
+	private PaymentsService paymentsService;
+	
     @PostMapping
     public ResponseEntity<Payment> create(@RequestBody CreatePayment request) {
 
@@ -29,7 +36,7 @@ public class PaymentController {
         	return ResponseEntity.notFound().build();
         	
     	try {
-    		final Payment payment = Payments.create(request);
+    		final Payment payment = this.paymentsService.create(request);
         	return ResponseEntity.status(HttpStatus.CREATED).body(payment);
     	} catch (InvalidPaymentException ex) {
     		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -39,7 +46,7 @@ public class PaymentController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Payment> get(@PathVariable("id") String id) {
 		try {
-			return ResponseEntity.ok().body(Payments.get(id));
+			return ResponseEntity.ok().body(this.paymentsService.get(id));
 		} catch (PaymentNotFoundException e) {
 			return ResponseEntity.notFound().build();
 		}
@@ -49,7 +56,7 @@ public class PaymentController {
     public ResponseEntity<Payment> execute(@PathVariable("id") String id) {
 
     	try {
-			final Payment payment = Payments.execute(id);
+			final Payment payment = this.paymentsService.execute(id);
 	        return ResponseEntity.ok().body(payment);
 		} catch (PaymentNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -62,7 +69,7 @@ public class PaymentController {
     @PutMapping(path = "/cancel/{id}")
     public ResponseEntity<Payment> cancel(@PathVariable("id") String id) {
     	try {
-			final Payment payment = Payments.cancel(id);
+			final Payment payment = this.paymentsService.cancel(id);
 	        return ResponseEntity.ok().body(payment);
 		} catch (PaymentNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -73,10 +80,10 @@ public class PaymentController {
     
     private boolean accountValidate(final CreatePayment request) {
         
-    	if (!Accounts.exists(request.getSourceAccountId()))
+    	if (!this.accountsService.exists(request.getSourceAccountId()))
         	return false;
 
-        if (request.getDestinationAccountId() != request.getSourceAccountId() && !Accounts.exists(request.getDestinationAccountId()))
+        if (request.getDestinationAccountId() != request.getSourceAccountId() && !this.accountsService.exists(request.getDestinationAccountId()))
         	return false;
         
     	return true;

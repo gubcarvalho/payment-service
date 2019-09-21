@@ -7,11 +7,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Transactions {
+import org.springframework.stereotype.Service;
+
+@Service
+public class TransactionsServiceImpl implements TransactionsService {
 		
     private static final Map<String, Transaction> TRANSACTIONS = new HashMap<>();
 
-    public static Transaction create(String account, Double amount) {
+    @Override
+	public Transaction create(String account, Double amount) {
 
     	final String id = String.valueOf(System.nanoTime());
         
