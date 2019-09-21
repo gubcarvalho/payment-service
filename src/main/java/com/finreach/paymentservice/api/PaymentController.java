@@ -10,7 +10,9 @@ import com.finreach.paymentservice.store.PaymentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -52,7 +54,7 @@ public class PaymentController {
 		}
     }
 
-    @PutMapping(path = "/execute/{id}")
+    @PatchMapping(path = "/{id}")
     public ResponseEntity<Payment> execute(@PathVariable("id") String id) {
 
     	try {
@@ -66,7 +68,7 @@ public class PaymentController {
 
     }
     
-    @PutMapping(path = "/cancel/{id}")
+    @DeleteMapping(path = "/{id}")
     public ResponseEntity<Payment> cancel(@PathVariable("id") String id) {
     	try {
 			final Payment payment = this.paymentsService.cancel(id);

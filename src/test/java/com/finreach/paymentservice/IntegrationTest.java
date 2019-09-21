@@ -66,7 +66,7 @@ public class IntegrationTest {
         
         
         final String id = mapper.readTree(result.getResponse().getContentAsString()).findValue("id").asText();
-        mockMvc.perform(put("/api/v1/payment/execute/" + id))
+        mockMvc.perform(patch("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("EXECUTED"));
  
@@ -84,7 +84,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.transactions[0].account").value(a2))
                 .andExpect(jsonPath("$.transactions[0].amount").value(50d));
 
-        mockMvc.perform(put("/api/v1/payment/cancel/" + id))
+        mockMvc.perform(delete("/api/v1/payment/" + id))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(get("/api/v1/payment/" + id))
@@ -118,7 +118,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.transactions").isEmpty());
 
         final String id = mapper.readTree(result.getResponse().getContentAsString()).findValue("id").asText();
-        mockMvc.perform(put("/api/v1/payment/execute/" + id))
+        mockMvc.perform(patch("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("REJECTED"));
 
@@ -132,7 +132,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.balance").value(0d))
                 .andExpect(jsonPath("$.transactions").isEmpty());
 
-        mockMvc.perform(put("/api/v1/payment/cancel/" + id))
+        mockMvc.perform(delete("/api/v1/payment/" + id))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(get("/api/v1/payment/" + id))
@@ -166,11 +166,11 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.transactions").isEmpty());
 
         final String id = mapper.readTree(result.getResponse().getContentAsString()).findValue("id").asText();
-        mockMvc.perform(put("/api/v1/payment/cancel/" + id))
+        mockMvc.perform(delete("/api/v1/payment/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("CANCELED"));
 
-        mockMvc.perform(put("/api/v1/payment/execute/" + id))
+        mockMvc.perform(patch("/api/v1/payment/" + id))
                 .andExpect(status().isBadRequest());
        
         mockMvc.perform(get("/api/v1/payment/" + id))
@@ -221,13 +221,13 @@ public class IntegrationTest {
 
     @Test
     public void scenario8() throws Exception {
-        mockMvc.perform(put("/api/v1/payment/execute/nonexistent"))
+        mockMvc.perform(patch("/api/v1/payment/nonexistent"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void scenario9() throws Exception {
-        mockMvc.perform(put("/api/v1/payment/cancel/nonexistent"))
+        mockMvc.perform(delete("/api/v1/payment/nonexistent"))
                 .andExpect(status().isNotFound());
     }
 
