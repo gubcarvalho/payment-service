@@ -11,10 +11,10 @@ public interface AccountsService {
 
 	boolean exists(String accountId);
 
-	Account get(String id) throws AccountNotFoundException;
+	Account get(String id);
 
 	List<Account> all();
 	
-	void transfer(String sourceAccountId, String destinationAccountId, Double amount) throws AccountNotFoundException, InsufficientFundsException;
+	void transfer(String sourceAccountId, String destinationAccountId, Double amount);
 
 }

@@ -2,7 +2,6 @@ package com.finreach.paymentservice.api;
 
 import com.finreach.paymentservice.api.request.CreateAccount;
 import com.finreach.paymentservice.model.Account;
-import com.finreach.paymentservice.service.AccountNotFoundException;
 import com.finreach.paymentservice.service.AccountsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +29,7 @@ public class AccountController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Account> get(@PathVariable("id") String id) {
-    	try {
-		    return ResponseEntity.ok(this.accountsService.get(id));
-		} catch (AccountNotFoundException e) {
-	    	return ResponseEntity.notFound().build();
-		}
+	    return ResponseEntity.ok(this.accountsService.get(id));
     }
-
+    
 }

@@ -7,14 +7,14 @@ import com.finreach.paymentservice.model.Payment;
 
 public interface PaymentsService {
 
-	Payment create(CreatePayment request) throws AccountNotFoundException, InvalidPaymentException;
+	Payment create(CreatePayment request);
 
-	Payment get(String id) throws PaymentNotFoundException;
+	Payment get(String id);
 
 	List<Payment> all();
 
-	Payment execute(String id) throws PaymentNotFoundException, InvalidPaymentException;
+	Payment execute(String id);
 
-	Payment cancel(String id) throws PaymentNotFoundException, InvalidPaymentException;
+	Payment cancel(String id);
 
 }

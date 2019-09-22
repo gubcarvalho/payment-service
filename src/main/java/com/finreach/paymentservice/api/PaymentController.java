@@ -2,9 +2,6 @@ package com.finreach.paymentservice.api;
 
 import com.finreach.paymentservice.api.request.CreatePayment;
 import com.finreach.paymentservice.model.Payment;
-import com.finreach.paymentservice.service.AccountNotFoundException;
-import com.finreach.paymentservice.service.InvalidPaymentException;
-import com.finreach.paymentservice.service.PaymentNotFoundException;
 import com.finreach.paymentservice.service.PaymentsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,48 +25,25 @@ public class PaymentController {
 	
     @PostMapping
     public ResponseEntity<Payment> create(@RequestBody CreatePayment request) {
-    	try {
-    		final Payment payment = this.paymentsService.create(request);
-        	return ResponseEntity.status(HttpStatus.CREATED).body(payment);
-    	} catch (AccountNotFoundException ex) {
-        	return ResponseEntity.notFound().build();
-    	} catch (InvalidPaymentException ex) {
-        	return ResponseEntity.badRequest().build();
-    	}
+		final Payment payment = this.paymentsService.create(request);
+    	return ResponseEntity.status(HttpStatus.CREATED).body(payment);
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<Payment> get(@PathVariable("id") String id) {
-		try {
-			return ResponseEntity.ok().body(this.paymentsService.get(id));
-		} catch (PaymentNotFoundException e) {
-			return ResponseEntity.notFound().build();
-		}
+		return ResponseEntity.ok().body(this.paymentsService.get(id));
     }
 
     @PatchMapping(path = "/{id}")
     public ResponseEntity<Payment> execute(@PathVariable("id") String id) {
-
-    	try {
-			final Payment payment = this.paymentsService.execute(id);
-	        return ResponseEntity.ok().body(payment);
-		} catch (PaymentNotFoundException e) {
-            return ResponseEntity.notFound().build();
-		} catch (InvalidPaymentException e) {
-        	return ResponseEntity.badRequest().build();
-		}
-
+		final Payment payment = this.paymentsService.execute(id);
+        return ResponseEntity.ok().body(payment);
     }
     
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Payment> cancel(@PathVariable("id") String id) {
-    	try {
-			final Payment payment = this.paymentsService.cancel(id);
-	        return ResponseEntity.ok().body(payment);
-		} catch (PaymentNotFoundException e) {
-            return ResponseEntity.notFound().build();
-		} catch (InvalidPaymentException e) {
-        	return ResponseEntity.badRequest().build();
-		}
+		final Payment payment = this.paymentsService.cancel(id);
+        return ResponseEntity.ok().body(payment);
     }
+    
 }

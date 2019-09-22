@@ -251,6 +251,14 @@ public class IntegrationTest {
         Assert.assertEquals(writer.toString(), actual);
     }
 
+    @Test
+    public void scenario11() throws Exception {
+        mockMvc.perform(get("/api/v1/payment/nonexistent"))
+        .andExpect(status().isNotFound());
+
+    }
+
+    
     private String createAccount(Double balance) throws Exception {
         return mapper.readTree(mockMvc.perform(post("/api/v1/account")
                 .contentType(MediaType.APPLICATION_JSON)

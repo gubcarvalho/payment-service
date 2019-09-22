@@ -1,11 +1,11 @@
 package com.finreach.paymentservice.service;
 
-public class AccountNotFoundException extends Exception {
+public class AccountNotFoundException extends RuntimeException {
 
-	private static final long serialVersionUID = 272413565572752930L;
+	private static final long serialVersionUID = -2762432403831706276L;
 
-	public AccountNotFoundException() {
-		super("The account doesn't have enough balance");
+	public AccountNotFoundException(String id) {
+		super("Account not found [id="+(id != null ? id.trim() : "")+"]");
 	}
 	
 }

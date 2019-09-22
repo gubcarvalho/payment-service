@@ -32,6 +32,7 @@ public class StatisticsServiceImpl implements StatisticsService {
        	Date from = Date.from( Instant.now().minusSeconds( sec ));
     	
     	Predicate<Transaction> p = t -> t.isEligibleForEstatistics(from, sec);
+    	
     	this.accountsService.all()
     		.forEach(account -> calculateEstatistics(account, p, statistics));
 

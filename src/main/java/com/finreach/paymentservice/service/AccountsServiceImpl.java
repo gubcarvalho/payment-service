@@ -38,7 +38,7 @@ public class AccountsServiceImpl implements AccountsService {
     }
     
     @Override
-    public void transfer(String sourceAccountId, String destinationAccountId, Double amount) throws AccountNotFoundException, InsufficientFundsException {
+    public void transfer(String sourceAccountId, String destinationAccountId, Double amount) {
     	
     	// get source and check funds
     	Account sourceAccount = this.get(sourceAccountId);
@@ -48,7 +48,6 @@ public class AccountsServiceImpl implements AccountsService {
     	// get destination
     	Account destinationAccount = this.get(destinationAccountId);
 
-		// TODO - tratar exception na transacao
     	// transfer the money between accounts
 		this.transaction(sourceAccount, -amount);
 		this.transaction(destinationAccount, amount);
@@ -65,11 +64,11 @@ public class AccountsServiceImpl implements AccountsService {
     }
     
     @Override
-	public Account get(String id) throws AccountNotFoundException {
+	public Account get(String id) {
     	
     	final Optional<Account> accountOpt = this.accountRepository.findById(id);
     	if (!accountOpt.isPresent())
-    		throw new AccountNotFoundException();
+    		throw new AccountNotFoundException(id);
 
     	return accountOpt.get();
     }

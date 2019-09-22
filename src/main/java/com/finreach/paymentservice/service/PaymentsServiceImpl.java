@@ -22,13 +22,13 @@ public class PaymentsServiceImpl implements PaymentsService {
 	private PaymentRepository paymentRepository;
 
     @Override
-	public Payment create(CreatePayment request) throws AccountNotFoundException, InvalidPaymentException  {
+	public Payment create(CreatePayment request) {
 
     	if (!this.accountsService.exists(request.getSourceAccountId()))
-        	throw new AccountNotFoundException();
+        	throw new AccountNotFoundException(request.getSourceAccountId());
 
     	if (!request.getDestinationAccountId().equals(request.getSourceAccountId()) && !this.accountsService.exists(request.getDestinationAccountId()))
-        	throw new AccountNotFoundException();
+        	throw new AccountNotFoundException(request.getDestinationAccountId());
 
         final Payment payment = new PaymentBuilder()
         		.setAmount( request.getAmount() )
@@ -42,7 +42,7 @@ public class PaymentsServiceImpl implements PaymentsService {
     }
 
     @Override
-	public Payment get(String id) throws PaymentNotFoundException {
+	public Payment get(String id) {
   
     	Optional<Payment> opt = this.paymentRepository.findById(id);
         if (!opt.isPresent())
@@ -57,7 +57,7 @@ public class PaymentsServiceImpl implements PaymentsService {
     }
 
     @Override
-	public Payment execute(String id) throws PaymentNotFoundException, InvalidPaymentException {
+	public Payment execute(String id) {
 
     	Payment payment = get(id);
         if (!payment.getState().equals(PaymentState.CREATED))
@@ -76,7 +76,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 	}
 
     @Override
-	public Payment cancel(String id) throws PaymentNotFoundException, InvalidPaymentException {
+	public Payment cancel(String id) {
 
         Payment payment = get(id);
         if (!payment.getState().equals(PaymentState.CREATED))
